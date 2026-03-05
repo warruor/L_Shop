@@ -3,108 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
     <title>Магазин</title>
+    <style>
+        body { 
+            font-family: 'Arial', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f4f4f4; 
+            color: #333; 
+        }
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 15px 30px; 
+            background: #292b2c; 
+            color: white; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        header a { 
+            color: white; 
+            text-decoration: none; 
+            padding: 10px 15px; 
+            border-radius: 5px; 
+            transition: background 0.3s; 
+        }
+        header a:hover { 
+            background: #3c4247; 
+        }
+        .container { 
+            display: flex; 
+            padding: 20px; 
+            max-width: 1200px; 
+            margin: auto; 
+        }
+        .products { 
+            flex: 3; 
+            display: flex; 
+            flex-wrap: wrap; 
+        }
+        .product { 
+            border: 1px solid #ddd; 
+            background: white; 
+            margin: 10px; 
+            padding: 15px; 
+            width: 200px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 8px; 
+            transition: box-shadow 0.2s; 
+        }
+        .product img { 
+            width: 100%; 
+            height: 120px; 
+            object-fit: cover; 
+            border-radius: 5px; 
+            margin-bottom: 10px; 
+        }
+        .product:hover { 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+        }
+        .filter { 
+            flex: 1; 
+            padding: 20px; 
+            border-left: 1px solid #ddd; 
+            background: #fff; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+            border-radius: 8px; 
+        }
+        .form-group { 
+            margin-bottom: 15px; 
+        }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 5px; 
+        }
+        button { 
+            background: #007bff; 
+            border: none; 
+            border-radius: 5px; 
+            color: white; 
+            padding: 10px; 
+            cursor: pointer; 
+            width: auto; 
+            transition: background 0.3s; 
+            display: inline-block; 
+        }
+        button:hover { 
+            background: #0056b3; 
+        }
+        input[type="text"], input[type="password"], input[type="number"], select { 
+            width: calc(100% - 20px); 
+            padding: 10px; 
+            margin-top: 5px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            box-sizing: border-box;
+        }
+        .modal { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: rgba(0,0,0,0.5); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .modal-content { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        p { 
+            margin: 10px 0; 
+        }
+        .hidden { 
+            display: none; 
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Магазин</h1>
-        <nav>
-            <button onclick="showPage('home')">Главная</button>
-            <button onclick="showPage('cart')">Корзина</button>
-           
-            <button onclick="showPage('login')">Вход</button>
-            <button onclick="showPage('delivery')">Доставка</button>
-        </nav>
-    </header>
 
-    <main id="content">
-        <div id="home" class="page">
-            <h2>Товары</h2>
-            <div class="container">
-                <div class="filter">
-                    <h3>Фильтры</h3>
-                    <label for="minPrice">Минимальная цена:</label>
-                    <input type="number" id="minPrice" placeholder="0">
+<header>
+    <a href="#" onclick="showPage('home')">Главная</a>
+    <a href="#" onclick="showPage('cart')">Корзина</a>
+    <a href="#" onclick="showPage('profile')">Личный кабинет</a>
+    <a href="#" onclick="showPage('login')">Вход</a>
+</header>
 
-                    <label for="maxPrice">Максимальная цена:</label>
-                    <input type="number" id="maxPrice" placeholder="1000">
+<div id="home" class="page">
+    <input type="text" id="search" placeholder="Поиск..." oninput="filterProducts()" />
+    <div class="container">
+        <div class="products" id="product-list"></div>
+        <div class="filter">
+            <h3>Фильтр</h3>
+            <label for="price-input">Максимальная цена:</label>
+            <input type="number" id="price-input" placeholder="Введите цену" oninput="filterProducts()" />
+            <button onclick="resetFilter()">Сбросить фильтр</button>
+        </div>
+    </div>
+</div>
 
-                    <h4>Доставка:</h4>
-                    <select id="deliveryTime">
-                        <option value="">Выберите вариант</option>
-                        <option value="tomorrow">Завтра</option>
-                        <option value="dayAfterTomorrow">Послезавтра</option>
-                        <option value="nextWeek">На следующей неделе</option>
-                    </select>
+<div id="cart" class="page hidden">
+    <h2>Корзина</h2>
+    <div id="cart-items"></div>
+    <label for="delivery-time">Выберите срок доставки:</label>
+    <select id="delivery-time">
+        <option value="завтра">Завтра</option>
+        <option value="послезавтра">Послезавтра</option>
+        <option value="5 дней">В течении 5 дней</option>
+    </select>
+    <button onclick="checkout()">Оформить заказ</button>
+</div>
 
-                    <button onclick="resetFilters()">Сбросить фильтры</button>
-                </div>
+<div id="profile" class="page hidden">
+    <h2>Личный кабинет</h2>
+    <p>Имя пользователя: <span id="username">Пользователь</span></p>
+    <h3>История заказов</h3>
+    <div id="order-history"></div>
+</div>
 
-                <div class="product-container">
-                    <div class="product" data-title="Товар 1" data-price="100">
-                        <img src="https://via.placeholder.com/150" alt="Товар 1">
-                        <h3>Товар 1</h3>
-                        <p class="price">Цена: 100 рублей</p>
-                        <button onclick="addToCart('Товар 1', 100)">В корзину</button>
-                    </div>
-                    <div class="product" data-title="Товар 2" data-price="200">
-                        <img src="https://via.placeholder.com/150" alt="Товар 2">
-                        <h3>Товар 2</h3>
-                        <p class="price">Цена: 200 рублей</p>
-                        <button onclick="addToCart('Товар 2', 200)">В корзину</button>
-                    </div>
-                    <div class="product" data-title="Товар 3" data-price="150">
-                        <img src="https://via.placeholder.com/150" alt="Товар 3">
-                        <h3>Товар 3</h3>
-                        <p class="price">Цена: 150 рублей</p>
-                        <button onclick="addToCart('Товар 3', 150)">В корзину</button>
-                    </div>
-                    <div class="product" data-title="Товар 4" data-price="250">
-                        <img src="https://via.placeholder.com/150" alt="Товар 4">
-                        <h3>Товар 4</h3>
-                        <p class="price">Цена: 250 рублей</p>
-                        <button onclick="addToCart('Товар 4', 250)">В корзину</button>
-                    </div>
-                </div>
+<div id="login" class="page hidden">
+    <h2>Вход в систему</h2>
+    <div class="form-group">
+        <label for="phone">Телефон:</label>
+        <input type="text" id="phone" placeholder="Введите номер телефона" />
+    </div>
+    <div class="form-group">
+        <label for="password-login">Пароль:</label>
+        <input type="password" id="password-login" placeholder="Введите пароль" />
+    </div>
+    <div>
+        <input type="checkbox" id="data-consent-login">
+        <label for="data-consent-login">Я согласен на обработку персональных данных</label>
+    </div>
+    <button onclick="login()">Войти</button>
+    <p id="toggle-to-register" onclick="toggleLoginRegister()">Ещё не зарегистрированы?</p>
+</div>
+
+<div id="register" class="page hidden">
+    <h2>Регистрация</h2>
+    <div class="form-group">
+        <label for="register-username">Имя пользователя:</label>
+        <input type="text" id="register-username" placeholder="Введите имя пользователя" />
+    </div>
+    <div class="form-group">
+        <label for="register-phone">Телефон:</label>
+        <input type="text" id="register-phone" placeholder="Введите номер телефона" />
+    </div>
+    <div class="form-group">
+        <label for="register-password">Пароль:</label>
+        <input type="password" id="register-password" placeholder="Введите пароль" />
+    </div>
+    <div class="form-group">
+        <label for="confirm-password">Подтверждение пароля:</label>
+        <input type="password" id="confirm-password" placeholder="Подтвердите пароль" />
+    </div>
+    <div>
+        <input type="checkbox" id="data-consent-register">
+        <label for="data-consent-register">Я согласен на обработку персональных данных</label>
+    </div>
+    <button onclick="register()">Зарегистрироваться</button>
+    <p id="toggle-to-login" onclick="toggleLoginRegister()">Уже зарегистрированы?</p>
+</div>
+
+<div class="hidden" id="modal" onclick="closeModal()">
+    <div class="modal-content">
+        <p id="modal-message"></p>
+        <button onclick="closeModal()">Закрыть</button>
+    </div>
+</div>
+
+<script>
+    const products = [
+        { id: 1, name: 'CHAPMAN-БРАУН', price: 8.20, image: 'чапман.jpg' },
+        { id: 2, name: 'CHAPMAN-РЭД', price: 8.20, image: 'чапман1.jpg' },
+        { id: 3, name: 'TEACIGA', price: 14.97, image: 'чайныесигареты.jpg' },
+        { id: 4, name: 'CHAPMAN-ГОЛД', price: 8.20, image: 'чапман-ваниль.jpg' },
+        { id: 5, name: 'CHAPMAN-Malina', price: 8.20, image: 'чапман-виноград.jpg' },
+        { id: 6, name: 'CHAPMAN-ВИОЛЕТ', price: 8.20, image: 'чапман-виолет.jpg' },
+        { id: 7, name: 'Marlboro-balck menthol', price: 7.80, image: 'мальборо-малина.jpg' },
+        { id: 8, name: 'CHAPMAN-ГРИН', price: 8.20, image: 'чапман-яблоко.png' },
+        { id: 9, name: 'DUNHILL', price: 8.90, image: 'данхил-вишня.jpg' },
+        { id: 10, name: 'DUNHILL', price: 8.90, image: 'данхил-красный.jpg' },
+        { id: 11, name: 'ROTHMANS', price: 6.50, image: 'ротманс.jpg' },
+        { id: 12, name: 'CHAPMAN-CLASSIC', price: 8.20, image: 'чапман-класс.jpg' },
+    ];
+
+    let cart = [];
+    let orders = [];
+    let username = '';
+
+    function displayProducts() {
+        const productList = document.getElementById('product-list');
+        productList.innerHTML = '';
+        products.forEach(product => {
+            productList.innerHTML += `
+                <div class="product">
+                    <img src="${product.image}" alt="${product.name}">
+                    <h4>${product.name}</h4>
+                    <p>${product.price}р</p>
+                    <button onclick="addToCart(${product.id})">Добавить в корзину</button>
+                </div>`;
+        });
+    }
+
+    function addToCart(productId) {
+        const product = products.find(p => p.id === productId);
+        cart.push(product);
+        updateCart();
+    }
+
+    function updateCart() {
+        const cartItems = document.getElementById('cart-items');
+        const total = cart.reduce((sum, item) => sum + item.price, 0);
+        cartItems.innerHTML = cart.map((item, index) => `
+            <div>
+                <input type="checkbox" id="item-${index}" checked />
+                <label for="item-${index}">${item.name} - ${item.price}₽</label>
+            </div>`).join('');
+        cartItems.innerHTML += `<strong>Общая сумма: ${total}₽</strong>`;
+    }
+
+    function checkout() {
+        const selectedItems = Array.from(document.querySelectorAll('#cart-items input[type="checkbox"]:checked'));
+        if (selectedItems.length === 0) {
+            showModal('Выберите хотя бы один товар!');
+            return;
+        }
+        
+        const orderDetails = {
+            items: selectedItems.map((checkbox, index) => cart[index]),
+            deliveryTime: document.getElementById('delivery-time').value,
+            total: selectedItems.reduce((sum, checkbox, index) => sum + cart[index].price, 0)
+        };
+        
+        orders.push(orderDetails);
+        cart = [];
+        showModal('Заказ успешно оформлен!');
+        updateCart();
+    }
+
+    function login() {
+        const phone = document.getElementById('phone').value;
+        const password = document.getElementById('password-login').value;
+        if (phone && password) {
+            showModal('Вход выполнен успешно!');
+        } else {
+            showModal('Пожалуйста, заполните все поля!');
+        }
+    }
+
+    function register() {
+        const newUsername = document.getElementById('register-username').value;
+        const newPhone = document.getElementById('register-phone').value;
+        const newPassword = document.getElementById('register-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        if (newUsername && newPhone && newPassword && confirmPassword) {
+            if (newPassword !== confirmPassword) {
+                showModal('Пароли не совпадают!');
+                return;
+            }
+            username = newUsername;
+            document.getElementById('username').innerText = username;
+            showModal('Регистрация успешна!');
+            showPage('login');
+        } else {
+            showModal('Пожалуйста, заполните все поля!');
+        }
+    }
+
+    function showModal(message) {
+        document.getElementById('modal').classList.remove('hidden');
+        document.getElementById('modal-message').innerText = message;
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.add('hidden');
+    }
+
+    function toggleLoginRegister() {
+        const loginPage = document.getElementById('login');
+        const registerPage = document.getElementById('register');
+
+        if (loginPage.classList.contains('hidden')) {
+            loginPage.classList.remove('hidden');
+            registerPage.classList.add('hidden');
+        } else {
+            loginPage.classList.add('hidden');
+            registerPage.classList.remove('hidden');
+        }
+    }
+
+    function filterProducts() {
+        const filterValue = document.getElementById('price-input').value;
+        const searchValue = document.getElementById('search').value.toLowerCase();
+        const productList = document.getElementById('product-list');
+        productList.innerHTML = '';
+
+        const filteredProducts = products.filter(product => 
+            (product.price <= filterValue || filterValue === '') &&
+            (product.name.toLowerCase().includes(searchValue))
+        );
+
+        filteredProducts.forEach(product => {
+            productList.innerHTML += `
+                <div class="product">
+                    <img src="${product.image}" alt="${product.name}">
+                    <h4>${product.name}</h4>
+                    <p>${product.price}₽</p>
+                    <button onclick="addToCart(${product.id})">Добавить в корзину</button>
+                </div>`;
+        });
+    }
+
+    function resetFilter() {
+        document.getElementById('price-input').value = '';
+        displayProducts();
+    }
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(page => {
+            page.classList.add('hidden');
+        });
+        document.getElementById(pageId).classList.remove('hidden');
+
+        if (pageId === 'home') {
+            displayProducts();
+        } else if (pageId === 'profile') {
+            updateOrderHistory();
+        }
+    }
+
+    function updateOrderHistory() {
+        const orderHistory = document.getElementById('order-history');
+        orderHistory.innerHTML = orders.map(order => `
+            <div>
+                <p>Заказ на сумму ${order.total}₽, доставка: ${order.deliveryTime}</p>
+                <ul>
+                    ${order.items.map(item => `<li>${item.name} - ${item.price}₽</li>`).join('')}
+                </ul>
             </div>
-        </div>
+        `).join('');
+    }
 
-        <div id="cart" class="page" style="display: none;">
-            <h2>Корзина</h2>
-            <div id="cartItems"></div>
-            <button onclick="showPage('delivery')">Оформить доставку</button>
-        </div>
-
-        <div id="registration" class="page" style="display: none;">
-            <h2>Регистрация</h2>
-            <form data-registration>
-                <input type="text" placeholder="Имя" required>
-                <input type="email" placeholder="Email" required>
-                <button type="submit">Зарегистрироваться</button>
-            </form>
-            <p>Уже зарегистрированы? <button onclick="showPage('login')">Войти</button></p>
-        </div>
-
-        <div id="login" class="page" style="display: none;">
-            <h2>Вход</h2>
-            <form data-login>
-                <input type="email" placeholder="Email" required>
-                <input type="password" placeholder="Пароль" required>
-                <button type="submit">Войти</button>
-            </form>
-            <p>Еще не зарегистрированы? <button onclick="showPage('registration')">Создать аккаунт</button></p>
-        </div>
-
-        <div id="delivery" class="page" style="display: none;">
-            <h2>Доставка</h2>
-            <form data-delivery>
-                <input type="text" placeholder="Адрес" required>
-                <button type="submit">Оформить</button>
-            </form>
-        </div>
-    </main>
-
-    <script src="script.js"></script>
+    document.addEventListener('DOMContentLoaded', () => {
+        showPage('home');
+    });
+</script>
 </body>
 </html>
