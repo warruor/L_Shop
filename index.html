@@ -353,7 +353,7 @@
                 <div class="product">
                     <img src="${product.image}" alt="${product.name}">
                     <h4>${product.name}</h4>
-                    <p>${product.price}₽</p>
+                    <p>${product.price}р</p>
                     <button onclick="addToCart(${product.id})">Добавить в корзину</button>
                 </div>`;
         });
@@ -381,7 +381,7 @@
         const orderHistory = document.getElementById('order-history');
         orderHistory.innerHTML = orders.map(order => `
             <div>
-                <p>Заказ на сумму ${order.total}₽, доставка: ${order.deliveryTime}</p>
+                <p>Заказ на сумму ${order.total}р, доставка: ${order.deliveryTime}</p>
                 <ul>
                     ${order.items.map(item => `<li>${item.name} - ${item.price}₽</li>`).join('')}
                 </ul>
