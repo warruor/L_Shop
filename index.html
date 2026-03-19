@@ -5,414 +5,892 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Магазин</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #f8f9fa; 
+            color: #333; 
+            line-height: 1.5;
         }
-        header {
-            display: flex;
+        
+        header { 
+            background: #1e293b; 
+            color: white; 
+            padding: 15px 25px; 
+            position: fixed;  /* МЕНЯЕМ sticky НА fixed */
+            top: 0; 
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2); 
+            display: flex; 
             justify-content: space-between;
             align-items: center;
-            padding: 15px 30px;
-            background: #292b2c;
-            color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        header a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            transition: background 0.3s;
+        header a { 
+            color: white; 
+            text-decoration: none; 
+            padding: 8px 15px; 
+            border-radius: 5px; 
+            font-weight: 500;
         }
-        header a:hover {
-            background: #3c4247;
+        header a:hover { background: #334155; }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 100px auto 2rem;  
+            padding: 25px 20px;
+            min-height: calc(100vh - 100px);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        h1 { color: #1e293b; margin-bottom: 25px; font-size: 2em; }
+        h2 { color: #1e293b; margin-bottom: 20px; font-size: 1.5em; }
+        h3 { color: #1e293b; margin-bottom: 15px; }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+            font-size: 16px; 
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #1e293b;
+        }
+        
+        button { 
+            background: #1e293b; 
+            color: white; 
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 16px;
+            font-weight: 500;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        button:hover { background: #334155; }
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+    
+        .search-bar {
+            max-width: 500px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+        .search-bar input {
+            padding-left: 40px;
         }
         .container {
             display: flex;
-            padding: 20px;
-            max-width: 1200px;
-            margin: auto;
+            gap: 25px;
+            margin-bottom: 30px;
         }
-        .products {
-            flex: 3;
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .product {
-            border: 1px solid #ddd;
-            background: white;
-            margin: 10px;
-            padding: 15px;
-            width: 200px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            transition: box-shadow 0.2s;
-            text-align: center;
-        }
-        .product img {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        .product:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        .filter {
+        .products { 
             flex: 1;
-            padding: 20px;
-            border-left: 1px solid #ddd;
-            background: #fffffe;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border-radius: 8px;
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+            gap: 20px; 
         }
-        .filter h3 {
-            margin-top: 0;
+        .product { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            text-align: center; 
+            box-shadow: 0 2px 10px #0001;
+            border: 1px solid #eee;
+            position: relative;
         }
-        button {
-            background: #007bff;
-            border: none;
-            border-radius: 5px;
+        .product.out-of-stock {
+            opacity: 0.7;
+        }
+        .product img { 
+            width: 100%; 
+            height: 140px; 
+            object-fit: cover; 
+            border-radius: 5px; 
+            margin-bottom: 15px; 
+            background: #f8f9fa;
+        }
+        .product h4 {
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+        .product-price {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+        .product-stock {
+            font-size: 0.9em;
+            color: #64748b;
+            margin-bottom: 15px;
+        }
+        .stock-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #dc2626;
             color: white;
-            padding: 10px 15px;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.3s;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+        
+        .filter-panel { 
+            width: 280px;
+            background: white; 
+            padding: 25px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px #0001;
+        }
+        
+        .cart-section {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .cart-item { 
+            background: white; 
+            padding: 20px; 
+            margin-bottom: 15px; 
+            border-radius: 8px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 15px;
+            box-shadow: 0 2px 10px #0001;
+        }
+        .cart-item-info {
+            flex: 1;
+        }
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             margin-top: 10px;
         }
-        button:hover {
-            background: #0056b3;
+        .cart-item-quantity button {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            font-size: 18px;
+            background: #e2e8f0;
+            color: #1e293b;
         }
-        input[type="number"],
-        input[type="text"],
-        input[type="password"],
-        select {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
+        .cart-item-quantity button:hover:not(:disabled) {
+            background: #cbd5e1;
         }
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .cart-item-quantity button:disabled {
+            opacity: 0.5;
         }
-        .modal-content {
+        .cart-item-quantity span {
+            font-size: 16px;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+        .cart-item button { 
+            width: auto; 
+            padding: 8px 15px; 
+            background: #ef4444; 
+            font-size: 14px;
+        }
+        .cart-item button:hover {
+            background: #dc2626;
+        }
+        .total { 
+            background: #1e293b; 
+            color: white; 
+            padding: 25px; 
+            text-align: center; 
+            font-size: 1.5em; 
+            font-weight: bold; 
+            border-radius: 8px; 
+            margin: 25px 0; 
+        }
+        
+        .form-container { 
+            max-width: 450px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px #0001; 
+        }
+        .toggle-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            cursor: pointer;
+        }
+        .toggle-link:hover {
+            color: #1e293b;
+        }
+        
+        .profile-card {
             background: white;
-            padding: 20px;
+            padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 10px #0001;
+            margin-bottom: 25px;
+            text-align: center;
         }
-        .hidden {
-            display: none;
+        .orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .order-card { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px #0001;
+            border-left: 4px solid #1e293b;
+        }
+        .order-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .order-item-tag {
+            background: #f1f5f9;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .modal { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: rgba(0,0,0,0.5); 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000; 
+        }
+        .modal.active { display: flex; }
+        .modal-content { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 8px; 
+            max-width: 450px; 
+            width: 90%; 
+            text-align: center; 
+            box-shadow: 0 10px 30px #0002;
+        }
+        
+        .notification { 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            background: #1e293b; 
+            color: white; 
+            padding: 15px 25px; 
+            border-radius: 5px; 
+            transform: translateX(350px); 
+            transition: transform 0.3s; 
+            z-index: 999; 
+            box-shadow: 0 4px 15px #0002;
+        }
+        .notification.show { transform: translateX(0); }
+        
+        @media (max-width: 768px) {
+            header {
+                justify-content: center;
+                text-align: center;
+            }
+            .container {
+                flex-direction: column;
+            }
+            .filter-panel {
+                width: 100%;
+                margin-left: 0;
+            }
+            .cart-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            .main-container {
+                padding: 20px 15px;
+            }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <a href="#" onclick="showPage('home')">Главная</a>
-    <a href="#" onclick="showPage('cart')">Корзина</a>
-    <a href="#" onclick="showPage('profile')">Личный кабинет</a>
-    <a href="#" onclick="showPage('login')">Вход</a>
+    <nav>
+        <a href="#" onclick="showPage('home')">Главная</a>
+        <a href="#" onclick="showPage('cart')">Корзина (<span id="cartCount">0</span>)</a>
+        <a href="#" onclick="showPage('profile')">Кабинет</a>
+        <a href="#" onclick="showPage('login')" id="authLink">Вход</a>
+    </nav>
 </header>
 
-<div id="home" class="page">
-    <input type="text" id="search" placeholder="Поиск..." oninput="filterProducts()" />
-    <div class="container">
-        <div class="products" id="product-list"></div>
-        <div class="filter">
-            <h3>Фильтр</h3>
-            <label for="price-input">Максимальная цена:</label>
-            <input type="number" id="price-input" min="2" max="1000" placeholder="Введите цену" oninput="filterProducts()" />
-            <button onclick="resetFilter()">Сбросить фильтр</button>
+<main class="main-container">
+    
+    <section id="home" class="page active">
+        <div class="search-bar">
+            <input type="search" id="search" placeholder="Поиск товаров..." oninput="filterProducts()">
         </div>
-    </div>
-</div>
+        
+        <div class="container">
+            <div class="products" id="products"></div>
+            
+            <aside class="filter-panel">
+                <h3>Фильтр</h3>
+                <div class="form-group">
+                    <label for="priceMax">Максимальная цена</label>
+                    <input type="number" id="priceMax" min="0" placeholder="Цена" oninput="filterProducts()">
+                </div>
+                <button onclick="resetFilter()">Сбросить</button>
+            </aside>
+        </div>
+    </section>
 
-<div id="cart" class="page hidden">
-    <h2>Корзина</h2>
-    <div id="cart-items"></div>
-    <label for="delivery-time">Выберите срок доставки:</label>
-    <select id="delivery-time">
-        <option value="завтра">Завтра</option>
-        <option value="послезавтра">Послезавтра</option>
-        <option value="5 дней">В течении 5 дней</option>
-    </select>
-    <button onclick="checkout()">Оформить заказ</button>
-</div>
+    <section id="cart" class="page">
+        <h1>Корзина покупок</h1>
+        <div class="cart-section">
+            <div id="cartItems"></div>
+            
+            <div class="form-group">
+                <label for="adress">Адрес доставки</label>
+                <input type="text" id="adress" placeholder="Введите полный адрес">
+            </div>
+            
+            <div class="form-group">
+                <label for="delivery">Срок доставки</label>
+                <select id="delivery">
+                    <option value="завтра">Завтра</option>
+                    <option value="послезавтра">Послезавтра</option>
+                    <option value="5 дней">5 дней</option>
+                </select>
+            </div>
+            
+            <button onclick="checkout()">Оформить заказ</button>
+        </div>
+    </section>
 
-<div id="profile" class="page hidden">
-    <h2>Личный кабинет</h2>
-    <p>Имя пользователя: <span id="username">Пользователь</span></p>
-    <h3>История заказов</h3>
-    <div id="order-history"></div>
-</div>
+    <section id="profile" class="page">
+        <h1>Личный кабинет</h1>
+        <article class="profile-card">
+            <h2>Добро пожаловать, <span id="userName">Гость</span>!</h2>
+            <h3>История заказов</h3>
+            <div id="orders" class="orders-list"></div>
+        </article>
+    </section>
 
-<div id="login" class="page hidden">
-    <h2>Вход в систему</h2>
-    <div class="form-group">
-        <label for="phone">Телефон:</label>
-        <input type="text" id="phone" placeholder="Введите номер телефона" />
-    </div>
-    <div class="form-group">
-        <label for="password-login">Пароль:</label>
-        <input type="password" id="password-login" placeholder="Введите пароль" />
-    </div>
-    <div>
-        <input type="checkbox" id="data-consent-login">
-        <label for="data-consent-login">Я согласен на обработку персональных данных</label>
-    </div>
-    <button onclick="login()">Войти</button>
-    <p id="toggle-to-register" onclick="toggleLoginRegister()">Ещё не зарегистрированы?</p>
-</div>
+    <section id="login" class="page">
+        <div class="form-container">
+            <h1>Вход в аккаунт</h1>
+            <div class="form-group">
+                <label for="phone">Номер телефона</label>
+                <input type="tel" id="phone" placeholder="+375 (29) 123-45-67" required>
+            </div>
+            <div class="form-group">
+                <label for="pass">Пароль</label>
+                <input type="password" id="pass" placeholder="••••••••" required>
+            </div>
+            <button type="button" onclick="loginUser()">Войти</button>
+            <p class="toggle-link" onclick="showReg()">Нет аккаунта? Зарегистрироваться</p>
+        </div>
+    </section>
 
-<div id="register" class="page hidden">
-    <h2>Регистрация</h2>
-    <div class="form-group">
-        <label for="register-username">Имя пользователя:</label>
-        <input type="text" id="register-username" placeholder="Введите имя пользователя" />
-    </div>
-    <div class="form-group">
-        <label for="register-phone">Телефон:</label>
-        <input type="text" id="register-phone" placeholder="Введите номер телефона" />
-    </div>
-    <div class="form-group">
-        <label for="register-password">Пароль:</label>
-        <input type="password" id="register-password" placeholder="Введите пароль" />
-    </div>
-    <div class="form-group">
-        <label for="confirm-password">Подтверждение пароля:</label>
-        <input type="password" id="confirm-password" placeholder="Подтвердите пароль" />
-    </div>
-    <div>
-        <input type="checkbox" id="data-consent-register">
-        <label for="data-consent-register">Я согласен на обработку персональных данных</label>
-    </div>
-    <button onclick="register()">Зарегистрироваться</button>
-    <p id="toggle-to-login" onclick="toggleLoginRegister()">Уже зарегистрированы?</p>
-</div>
+    <section id="register" class="page">
+        <div class="form-container">
+            <h1>Регистрация</h1>
+            <div class="form-group">
+                <label for="regName">Имя пользователя</label>
+                <input type="text" id="regName" placeholder="Введите имя" required>
+            </div>
+            <div class="form-group">
+                <label for="regPhone">Номер телефона</label>
+                <input type="tel" id="regPhone" placeholder="+375 (29) 123-45-67" required>
+            </div>
+            <div class="form-group">
+                <label for="regPass">Пароль</label>
+                <input type="password" id="regPass" placeholder="••••••••" required>
+            </div>
+            <div class="form-group">
+                <label for="regPass2">Подтвердите пароль</label>
+                <input type="password" id="regPass2" placeholder="••••••••" required>
+            </div>
+            <button type="button" onclick="registerUser()">Зарегистрироваться</button>
+            <p class="toggle-link" onclick="showLogin()">Уже есть аккаунт? Войти</p>
+        </div>
+    </section>
 
-<div class="hidden" id="modal" onclick="closeModal()">
+</main>
+
+<dialog id="modal" class="modal">
     <div class="modal-content">
-        <p id="modal-message"></p>
-        <button onclick="closeModal()">Закрыть</button>
+        <p id="modalText"></p>
+        <button onclick="closeModal()">OK</button>
     </div>
-</div>
+</dialog>
+
+<div id="notify" class="notification"></div>
 
 <script>
-    const products = [
-        { id: 1, name: 'CHAPMAN-БРАУН', price: 8.20, image: 'чапман.jpg' },
-        { id: 2, name: 'CHAPMAN-РЭД', price: 8.20, image: 'чапман1.jpg' },
-        { id: 3, name: 'TEACIGA', price: 14.97, image: 'чайныесигареты.jpg' },
-        { id: 4, name: 'CHAPMAN-ГОЛД', price: 8.20, image: 'чапман-ваниль.jpg' },
-        { id: 5, name: 'CHAPMAN-Malina', price: 8.20, image: 'чапман-виноград.jpg' },
-        { id: 6, name: 'CHAPMAN-ВИОЛЕТ', price: 8.20, image: 'чапман-виолет.jpg' },
-        { id: 7, name: 'Marlboro-balck menthol', price: 7.80, image: 'мальборо-малина.jpg' },
-        { id: 8, name: 'CHAPMAN-ГРИН', price: 8.20, image: 'чапман-яблоко.png' },
-        { id: 9, name: 'DUNHILL', price: 8.90, image: 'данхил-вишня.jpg' },
-        { id: 10, name: 'DUNHILL', price: 8.90, image: 'данхил-красный.jpg' },
-        { id: 11, name: 'ROTHMANS', price: 6.50, image: 'ротманс.jpg' },
-        { id: 12, name: 'CHAPMAN-CLASSIC', price: 8.20, image: 'чапман-класс.jpg' },
-    ];
-
-    let cart = [];
-    let orders = [];
-    let username = '';
-
-    function displayProducts() {
-        const productList = document.getElementById('product-list');
-        productList.innerHTML = '';
-        products.forEach(product => {
-            productList.innerHTML += `
-                <div class="product">
-                    <img src="${product.image}" alt="${product.name}">
-                    <h4>${product.name}</h4>
-                    <p>${product.price}₽</p>
-                    <button onclick="addToCart(${product.id})">Добавить в корзину</button>
-                </div>`;
-        });
+const API = {
+    baseUrl: 'http://localhost:3000/api', 
+    endpoints: {
+        products: '/products',
+        login: '/auth/login',
+        register: '/auth/register',
+        orders: '/orders',
+        checkout: '/orders/checkout'
     }
+};
 
-    function addToCart(productId) {
-        const product = products.find(p => p.id === productId);
-        cart.push(product);
-        updateCart();
-    }
+let products = [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let currentUser = JSON.parse(localStorage.getItem('user')) || null;
+let orders = [];
 
-    function updateCart() {
-        const cartItems = document.getElementById('cart-items');
-        const total = cart.reduce((sum, item) => sum + item.price, 0);
-        cartItems.innerHTML = cart.map((item, index) => `
-            <div>
-                <input type="checkbox" id="item-${index}" checked />
-                <label for="item-${index}">${item.name} - ${item.price}₽</label>
-            </div>`).join('');
-        cartItems.innerHTML += `<strong>Общая сумма: ${total}₽</strong>`;
-    }
+const productImages = {
+    1: 'чапман.jpg',
+    2: 'чапман1.jpg',
+    3: 'чайныесигареты.jpg',
+    4: 'чапман-ваниль.jpg',
+    5: 'чапман-виноград.jpg',
+    6: 'чапман-виолет.jpg',
+    7: 'мальборо-малина.jpg',
+    8: 'чапман-яблоко.png',
+    9: 'данхил-вишня.jpg',
+    10: 'данхил-красный.jpg',
+    11: 'ротманс.jpg',
+    12: 'чапман-класс.jpg'
+};
 
-    function checkout() {
-        const selectedItems = Array.from(document.querySelectorAll('#cart-items input[type="checkbox"]:checked'));
-        if (selectedItems.length === 0) {
-            showModal('Выберите хотя бы один товар!');
-            return;
-        }
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadProducts();
+    updateCartCount();
+    updateAuthUI();
+    showPage('home');
+});
 
-        const orderDetails = {
-            items: selectedItems.map((checkbox, index) => cart[index]),
-            deliveryTime: document.getElementById('delivery-time').value,
-            total: selectedItems.reduce((sum, checkbox, index) => sum + cart[index].price, 0)
-        };
-
-        orders.push(orderDetails);
-        cart = [];
-        showModal('Заказ успешно оформлен!');
-        updateCart();
-    }
-
-    function login() {
-        const phone = document.getElementById('phone').value;
-        const password = document.getElementById('password-login').value;
-
-        // Проверка на заполнение полей
-        if (!phone || !password) {
-            showModal('Пожалуйста, заполните все поля!');
-            return;
-        }
-
-        // Проверка формата телефона
-        const phoneRegex = /^\+?\d{10,15}$/; // Примерный формат телефона
-        if (!phoneRegex.test(phone)) {
-            showModal('Введите корректный номер телефона!');
-            return;
-        }
-
-        // Вход выполнен успешно
-        showModal('Вход выполнен успешно!');
-    }
-
-    function register() {
-        const newUsername = document.getElementById('register-username').value;
-        const newPhone = document.getElementById('register-phone').value;
-        const newPassword = document.getElementById('register-password').value;
-        const confirmPassword = document.getElementById('confirm-password').value;
-
-        // Проверка на заполнение полей
-        if (!newUsername || !newPhone || !newPassword || !confirmPassword) {
-            showModal('Пожалуйста, заполните все поля!');
-            return;
-        }
-
-        // Проверка на совпадение паролей
-        if (newPassword !== confirmPassword) {
-            showModal('Пароли не совпадают!');
-            return;
-        }
-
-        // Проверка формата телефона
-        const phoneRegex = /^\+?\d{10,15}$/; // Примерный формат телефона
-        if (!phoneRegex.test(newPhone)) {
-            showModal('Введите корректный номер телефона!');
-            return;
-        }
-
-        // Регистрация успешна
-        username = newUsername;
-        document.getElementById('username').innerText = username;
-        showModal('Регистрация успешна!');
-        showPage('login');
-    }
-
-    function showModal(message) {
-        document.getElementById('modal').classList.remove('hidden');
-        document.getElementById('modal-message').innerText = message;
-    }
-
-    function closeModal() {
-        document.getElementById('modal').classList.add('hidden');
-    }
-
-    function toggleLoginRegister() {
-        const loginPage = document.getElementById('login');
-        const registerPage = document.getElementById('register');
-
-        if (loginPage.classList.contains('hidden')) {
-            loginPage.classList.remove('hidden');
-            registerPage.classList.add('hidden');
+async function loadProducts() {
+    try {
+        const response = await fetch(API.baseUrl + API.endpoints.products);
+        if (response.ok) {
+            const dbProducts = await response.json();
+            products = dbProducts.map(p => ({
+                id: p.id,
+                name: p.name,
+                price: parseFloat(p.price) || 0,
+                stock: parseInt(p.stock) || 0,
+                img: productImages[p.id] || 'placeholder.jpg' 
+            }));
+            console.log('Товары загружены из БД:', products);
         } else {
-            loginPage.classList.add('hidden');
-            registerPage.classList.remove('hidden');
+            showModal('Ошибка загрузки товаров с сервера');
         }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showModal('Сервер недоступен');
     }
+    showProducts();
+}
 
-    function filterProducts() {
-        const filterValue = document.getElementById('price-input').value;
-        const searchValue = document.getElementById('search').value.toLowerCase();
-        const productList = document.getElementById('product-list');
-        productList.innerHTML = '';
-
-        const filteredProducts = products.filter(product =>
-            (product.price <= filterValue && product.price >= 2 || filterValue === '') &&
-            (product.name.toLowerCase().includes(searchValue))
-        );
-
-        filteredProducts.forEach(product => {
-            productList.innerHTML += `
-                <div class="product">
-                    <img src="${product.image}" alt="${product.name}">
-                    <h4>${product.name}</h4>
-                    <p>${product.price}₽</p>
-                    <button onclick="addToCart(${product.id})">Добавить в корзину</button>
-                </div>`;
-        });
+function updateAuthUI() {
+    const authLink = document.getElementById('authLink');
+    const userNameSpan = document.getElementById('userName');
+    
+    if (currentUser) {
+        authLink.textContent = `Выход (${currentUser.name})`;
+        authLink.onclick = logout;
+        userNameSpan.textContent = currentUser.name;
+    } else {
+        authLink.textContent = 'Вход';
+        authLink.onclick = () => showPage('login');
+        userNameSpan.textContent = 'Гость';
     }
+}
 
-    function resetFilter() {
-        document.getElementById('price-input').value = '';
-        displayProducts();
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('user');
+    cart = [];
+    localStorage.removeItem('cart');
+    updateCartCount();
+    updateAuthUI();
+    showPage('home');
+    showNotify('Вы вышли из системы');
+}
+
+function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if(id == 'home') showProducts();
+    if(id == 'cart') showCart();
+    if(id == 'profile') loadUserOrders();
+}
+
+function showProducts(filteredProducts = null) {
+    const productsToShow = filteredProducts || products;
+    if (!productsToShow || !productsToShow.length) {
+        document.getElementById('products').innerHTML = '<p style="text-align:center;padding:40px;">Загрузка...</p>';
+        return;
     }
+    
+    const html = productsToShow.map(p => {
+        if (!p) return '';
+        
+        const inCart = cart.find(item => item.product && item.product.id === p.id);
+        const availableStock = (p.stock || 0) - (inCart ? inCart.quantity : 0);
+        const isAvailable = availableStock > 0;
+        
+        return `
+        <article class="product ${!isAvailable ? 'out-of-stock' : ''}">
+            <img src="${p.img || 'placeholder.jpg'}" alt="${p.name || 'Товар'}" 
+                 onerror="this.src='https://via.placeholder.com/240x140/eee/999?text=Фото'">
+            <h4>${p.name || 'Без названия'}</h4>
+            <p class="product-price">${(p.price || 0).toFixed(2)}p</p>
+            <p class="product-stock">Осталось: ${p.stock || 0} шт.</p>
+            ${!isAvailable ? '<div class="stock-badge">Нет в наличии</div>' : ''}
+            <button onclick="addToCart(${p.id})" ${!isAvailable ? 'disabled' : ''}>
+                🛒 ${isAvailable ? 'В корзину' : 'Нет в наличии'}
+            </button>
+        </article>
+    `}).join('');
+    
+    const productsEl = document.getElementById('products');
+    if (productsEl) productsEl.innerHTML = html;
+}
 
-    function showPage(pageId) {
-        document.querySelectorAll('.page').forEach(page => {
-            page.classList.add('hidden');
-        });
-        document.getElementById(pageId).classList.remove('hidden');
+function filterProducts() {
+    const searchTerm = document.getElementById('search').value.toLowerCase();
+    const maxPrice = parseFloat(document.getElementById('priceMax').value) || Infinity;
+    const filtered = products.filter(p => 
+        p.name.toLowerCase().includes(searchTerm) && p.price <= maxPrice
+    );
+    showProducts(filtered);
+}
 
-        if (pageId === 'home') {
-            displayProducts();
-        } else if (pageId === 'profile') {
-            updateOrderHistory();
-        }
+function resetFilter() {
+    document.getElementById('search').value = '';
+    document.getElementById('priceMax').value = '';
+    showProducts();
+}
+
+function addToCart(productId) {
+    const product = products.find(p => p.id == productId);
+    const cartItem = cart.find(item => item.product.id === productId);
+    const currentQuantity = cartItem ? cartItem.quantity : 0;
+    
+    if (currentQuantity >= product.stock) {
+        showModal('Нельзя добавить больше товара, чем есть в наличии');
+        return;
     }
+    
+    if (cartItem) {
+        cartItem.quantity++;
+    } else {
+        cart.push({ product: product, quantity: 1 });
+    }
+    
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    showProducts();
+    showNotify(`${product.name} добавлен в корзину`);
+}
 
-    function updateOrderHistory() {
-        const orderHistory = document.getElementById('order-history');
-        orderHistory.innerHTML = orders.map(order => `
-            <div>
-                <p>Заказ на сумму ${order.total}₽, доставка: ${order.deliveryTime}</p>
-                <ul>
-                    ${order.items.map(item => `<li>${item.name} - ${item.price}₽</li>`).join('')}
-                </ul>
+function updateCartCount() {
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    document.getElementById('cartCount').textContent = totalItems;
+}
+
+function showCart() {
+    if (cart.length === 0) {
+        document.getElementById('cartItems').innerHTML = '<p style="text-align:center;padding:40px;color:#666">Корзина пуста</p>';
+        return;
+    }
+    
+    let html = '';
+    let total = 0;
+    
+    cart.forEach((item, index) => {
+        const product = item.product;
+        const itemTotal = product.price * item.quantity;
+        total += itemTotal;
+        
+        html += `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img src="${product.img}" alt="${product.name}" style="width: 50px; height: 50px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/50x50/eee/999?text=Фото'">
+                        <div>
+                            <strong>${product.name}</strong><br>
+                            <span>${product.price.toFixed(2)}p за шт.</span>
+                        </div>
+                    </div>
+                    <div class="cart-item-quantity">
+                        <button onclick="updateQuantity(${index}, -1)" ${item.quantity <= 1 ? 'disabled' : ''}>−</button>
+                        <span>${item.quantity}</span>
+                        <button onclick="updateQuantity(${index}, 1)" ${item.quantity >= product.stock ? 'disabled' : ''}>+</button>
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <strong>${itemTotal.toFixed(2)}p</strong>
+                    <button onclick="removeFromCart(${index})" style="background: #ef4444;">Удалить</button>
+                </div>
             </div>
-        `).join('');
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        showPage('home');
+        `;
     });
+    
+    html += `<div class="total">Итого: ${total.toFixed(2)}p</div>`;
+    document.getElementById('cartItems').innerHTML = html;
+}
+
+function updateQuantity(index, change) {
+    const item = cart[index];
+    const newQuantity = item.quantity + change;
+    
+    if (newQuantity < 1) return;
+    if (newQuantity > item.product.stock) {
+        showModal('Нельзя добавить больше товара, чем есть в наличии');
+        return;
+    }
+    
+    item.quantity = newQuantity;
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    showCart();
+    showProducts();
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    showCart();
+    showProducts();
+    showNotify('Товар удален из корзины');
+}
+
+async function checkout() {
+    if (!currentUser) {
+        showModal('Необходимо авторизоваться');
+        showPage('login');
+        return;
+    }
+    
+    const adress = document.getElementById('adress').value.trim();
+    if (!adress) {
+        showModal('Введите адрес доставки');
+        return;
+    }
+  
+    for (const item of cart) {
+        if (item.quantity > item.product.stock) {
+            showModal(`Товара "${item.product.name}" осталось только ${item.product.stock} шт.`);
+            return;
+        }
+    }
+    
+    const total = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+    
+    const orderData = {
+        userId: currentUser.id,
+        items: cart.map(item => ({
+            productId: item.product.id,
+            quantity: item.quantity,
+            price: item.product.price
+        })),
+        total: total,
+        adress: adress,
+        deliveryTime: document.getElementById('delivery').value
+    };
+    
+    try {
+        const response = await fetch(API.baseUrl + API.endpoints.checkout, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        });
+        
+        if (response.ok) {
+            cart.forEach(item => {
+                const product = products.find(p => p.id === item.product.id);
+                if (product) {
+                    product.stock -= item.quantity;
+                }
+            });
+            
+            cart = [];
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            showProducts();
+            showModal(`Заказ оформлен!\nСумма: ${total.toFixed(2)}p\nАдрес: ${adress}`);
+            document.getElementById('adress').value = '';
+            showPage('home');
+        } else {
+            showModal('Ошибка при оформлении заказа');
+        }
+    } catch (error) {
+        showModal('Сервер недоступен. Заказ не оформлен.');
+    }
+}
+
+async function loginUser() {
+    const phone = document.getElementById('phone').value.trim();
+    const password = document.getElementById('pass').value.trim();
+    
+    if (!phone || !password) {
+        showModal('Заполните все поля');
+        return;
+    }
+    
+    try {
+        const response = await fetch(API.baseUrl + API.endpoints.login, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, password })
+        });
+        
+        if (response.ok) {
+            const user = await response.json();
+            currentUser = user;
+            localStorage.setItem('user', JSON.stringify(user));
+            updateAuthUI();
+            showModal('Вход выполнен успешно!');
+            showPage('home');
+        } else {
+            showModal('Неверный телефон или пароль');
+        }
+    } catch (error) {
+        showModal('Сервер недоступен');
+    }
+}
+
+async function registerUser() {
+    const name = document.getElementById('regName').value.trim();
+    const phone = document.getElementById('regPhone').value.trim();
+    const password = document.getElementById('regPass').value;
+    const password2 = document.getElementById('regPass2').value;
+    
+    if (!name || !phone || !password || !password2) {
+        showModal('Заполните все поля');
+        return;
+    }
+    
+    if (password !== password2) {
+        showModal('Пароли не совпадают');
+        return;
+    }
+    
+    try {
+        const response = await fetch(API.baseUrl + API.endpoints.register, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, phone, password })
+        });
+        
+        if (response.ok) {
+            const user = await response.json();
+            currentUser = user;
+            localStorage.setItem('user', JSON.stringify(user));
+            updateAuthUI();
+            showModal('Регистрация успешна!');
+            showPage('home');
+        } else {
+            showModal('Ошибка при регистрации');
+        }
+    } catch (error) {
+        showModal('Сервер недоступен');
+    }
+}
+
+async function loadUserOrders() {
+    if (!currentUser) {
+        document.getElementById('orders').innerHTML = '<p style="text-align:center;padding:30px;color:#666">Авторизуйтесь для просмотра заказов</p>';
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API.baseUrl}${API.endpoints.orders}?userId=${currentUser.id}`);
+        if (response.ok) {
+            orders = await response.json();
+            displayOrders();
+        } else {
+            document.getElementById('orders').innerHTML = '<p style="text-align:center;padding:30px;color:#666">Нет заказов</p>';
+        }
+    } catch (error) {
+        document.getElementById('orders').innerHTML = '<p style="text-align:center;padding:30px;color:#666">Ошибка загрузки</p>';
+    }
+}
+
+function displayOrders() {
+    if (orders.length === 0) {
+        document.getElementById('orders').innerHTML = '<p style="text-align:center;padding:30px;color:#666">История заказов пуста</p>';
+        return;
+    }
+    
+    const html = orders.map(order => `
+        <article class="order-card">
+            <h4>Заказ №${order.id}</h4>
+            <p><strong>Сумма:</strong> ${order.total}p</p>
+            <p><strong>Адрес:</strong> ${order.adress || order.address}</p>
+            <p><strong>Статус:</strong> ${order.status || 'новый'}</p>
+        </article>
+    `).join('');
+    
+    document.getElementById('orders').innerHTML = html;
+}
+
+function showLogin() {
+    document.getElementById('login').classList.add('active');
+    document.getElementById('register').classList.remove('active');
+}
+
+function showReg() {
+    document.getElementById('register').classList.add('active');
+    document.getElementById('login').classList.remove('active');
+}
+
+function showModal(text) {
+    document.getElementById('modal').classList.add('active');
+    document.getElementById('modalText').textContent = text;
+}
+
+function closeModal() {
+    document.getElementById('modal').classList.remove('active');
+}
+
+function showNotify(text) {
+    const notify = document.getElementById('notify');
+    notify.textContent = text;
+    notify.classList.add('show');
+    setTimeout(() => notify.classList.remove('show'), 3000);
+}
 </script>
+
 </body>
 </html>
